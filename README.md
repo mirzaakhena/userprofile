@@ -42,6 +42,6 @@ $ go run main.go simplememory
 
 To run with real database (SQLite) (under gateway indatabase) you can use this command
 ```
-$ go run main.go usedatabase
+$ go run main.go usingdb
 ```
 
