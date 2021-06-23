@@ -49,6 +49,7 @@ func NewUser(req UserRequest) (*User, error) {
 	obj.Address = req.Address
 	obj.Email = req.Email
 	obj.ID = req.UserID
+	obj.ActivationToken = req.ActivationToken
 	obj.HashedPassword = req.HashedPassword
 	obj.Status = vo.NotActiveUserStatusEnum
 

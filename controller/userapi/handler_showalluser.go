@@ -2,7 +2,6 @@ package userapi
 
 import (
 	"net/http"
-	"userprofile/application/apperror"
 	"userprofile/infrastructure/log"
 	"userprofile/infrastructure/util"
 	"userprofile/usecase/showalluser"
@@ -18,12 +17,6 @@ func (r *Controller) showAllUserHandler(inputPort showalluser.Inport) gin.Handle
 		ctx := log.Context(c.Request.Context())
 
 		var req showalluser.InportRequest
-		if err := c.BindJSON(&req); err != nil {
-			newErr := apperror.FailUnmarshalResponseBodyError
-			log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, NewErrorResponse(newErr))
-			return
-		}
 
 		log.Info(ctx, util.MustJSON(req))
 

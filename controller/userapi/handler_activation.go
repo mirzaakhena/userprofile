@@ -1,41 +1,37 @@
 package userapi
 
 import (
-	"net/http"
-	"userprofile/application/apperror"
-	"userprofile/infrastructure/log"
-	"userprofile/infrastructure/util"
-	"userprofile/usecase/activation"
+  "net/http"
+  "userprofile/infrastructure/log"
+  "userprofile/infrastructure/util"
+  "userprofile/usecase/activation"
 
-	"github.com/gin-gonic/gin"
+  "github.com/gin-gonic/gin"
 )
 
 // activationHandler ...
 func (r *Controller) activationHandler(inputPort activation.Inport) gin.HandlerFunc {
 
-	return func(c *gin.Context) {
+  return func(c *gin.Context) {
 
-		ctx := log.Context(c.Request.Context())
+    ctx := log.Context(c.Request.Context())
 
-		var req activation.InportRequest
-		if err := c.BindJSON(&req); err != nil {
-			newErr := apperror.FailUnmarshalResponseBodyError
-			log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, NewErrorResponse(newErr))
-			return
-		}
+    req := activation.InportRequest{
+      Email:           c.Param("email"),
+      ActivationToken: c.Param("token"),
+    }
 
-		log.Info(ctx, util.MustJSON(req))
+    log.Info(ctx, util.MustJSON(req))
 
-		res, err := inputPort.Execute(ctx, req)
-		if err != nil {
-			log.Error(ctx, err.Error())
-			c.JSON(http.StatusBadRequest, NewErrorResponse(err))
-			return
-		}
+    res, err := inputPort.Execute(ctx, req)
+    if err != nil {
+      log.Error(ctx, err.Error())
+      c.JSON(http.StatusBadRequest, NewErrorResponse(err))
+      return
+    }
 
-		log.Info(ctx, util.MustJSON(res))
-		c.JSON(http.StatusOK, NewSuccessResponse(res))
+    log.Info(ctx, util.MustJSON(res))
+    c.JSON(http.StatusOK, NewSuccessResponse(res))
 
-	}
+  }
 }

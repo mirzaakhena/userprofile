@@ -25,6 +25,8 @@ func (r *Controller) updateUserHandler(inputPort updateuser.Inport) gin.HandlerF
 			return
 		}
 
+		req.UserID = c.Param("userID")
+
 		log.Info(ctx, util.MustJSON(req))
 
 		res, err := inputPort.Execute(ctx, req)

@@ -10,8 +10,8 @@ type Outport interface {
 	repository.SaveUserRepo
 	repository.FindOneUserByEmailRepo
 	service.GenerateUUIDService
-	service.GenerateTokenService
 	service.SendEmailService
 	service.ConstructStartActivationMessageService
 	service.HashPasswordService
+	service.GenerateRandomStringService
 }

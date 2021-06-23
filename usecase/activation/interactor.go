@@ -24,6 +24,8 @@ func (r *activationInteractor) Execute(ctx context.Context, req InportRequest) (
 
 	res := &InportResponse{}
 
+	//!
+
 	userObj, err := r.outport.FindOneUserByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
