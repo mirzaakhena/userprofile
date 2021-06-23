@@ -75,11 +75,16 @@ POST /login
 ### Get All User
 ```
 GET /user
+
+Authorization Bearer <token_from login>
+
 ```
 
 ### Get Specific User
 ```
 GET /user/<user_id>
+
+Authorization Bearer <token_from login>
 ```
 
 ### Update user data
@@ -88,6 +93,8 @@ PUT /user/<user_id>
 {
     "Address": "Jakarta"
 }
+
+Authorization Bearer <token_from login>
 ```
 
 
