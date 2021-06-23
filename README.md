@@ -45,3 +45,49 @@ To run with real database (SQLite) (under gateway indatabase) you can use this c
 $ go run main.go usingdb
 ```
 
+## Using Postman you can run those API
+
+
+### Register
+```
+POST /register
+{
+    "Address": "Bandung",
+    "Email": "mirza@gmail.com",
+    "Password": "12345"
+}
+```
+
+### Activation
+```
+GET /activation/mirza@gmail.com/<random_string_generated>
+```
+
+### Login
+```
+POST /login
+{
+    "Email": "mirza@gmail.com",
+    "Password": "12345"
+}
+```
+
+### Get All User
+```
+GET /user
+```
+
+### Get Specific User
+```
+GET /user/<user_id>
+```
+
+### Update user data
+```
+PUT /user/<user_id>
+{
+    "Address": "Jakarta"
+}
+```
+
+

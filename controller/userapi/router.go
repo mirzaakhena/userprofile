@@ -25,10 +25,10 @@ type Controller struct {
 
 // RegisterRouter registering all the router
 func (r *Controller) RegisterRouter() {
-  r.Router.POST("/registeruser", r.registerUserHandler(r.RegisterUserInport))
+  r.Router.POST("/register", r.registerUserHandler(r.RegisterUserInport))
   r.Router.GET("/activation/:email/:token", r.activationHandler(r.ActivationInport))
   r.Router.POST("/login", r.loginUserHandler(r.LoginUserInport))
-  r.Router.GET("/user", r.showAllUserHandler(r.ShowAllUserInport))
-  r.Router.GET("/user/:userID", r.showUserHandler(r.ShowUserInport))
-  r.Router.PUT("/user/:userID", r.updateUserHandler(r.UpdateUserInport))
+  r.Router.GET("/user", r.authorized(), r.showAllUserHandler(r.ShowAllUserInport))
+  r.Router.GET("/user/:userID", r.authorized(), r.showUserHandler(r.ShowUserInport))
+  r.Router.PUT("/user/:userID", r.authorized(), r.updateUserHandler(r.UpdateUserInport))
 }
