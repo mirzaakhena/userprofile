@@ -16,19 +16,6 @@ type SendEmailServiceRequest struct {
   ContentBody      string
 }
 
-type SendEmailActivationService interface {
-  SendEmailActivation(ctx context.Context, req SendEmailActivationServiceRequest) error
-}
-
-type SendEmailActivationServiceRequest struct {
-  Email           string
-  ActivationToken string
-}
-
-type SendEmailSuccessActivationService interface {
-  SendEmailSuccessActivation(ctx context.Context, email string) error
-}
-
 type ConstructSuccessActivationMessageService interface {
   ConstructSuccessActivationMessage(ctx context.Context, req ConstructSuccessActivationMessageServiceRequest) (*MessageServiceResponse, error)
 }
@@ -71,6 +58,7 @@ type ValidatePasswordServiceRequest struct {
   PlainPassword  string
   HashedPassword string
 }
+
 type GenerateRandomStringService interface {
   GenerateRandomString(ctx context.Context) string
 }
