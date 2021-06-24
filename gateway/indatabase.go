@@ -14,7 +14,6 @@ type indatabaseGateway struct {
   database.GormReadOnlyImpl
   database.GormTransactionImpl
   commonImplementation
-  DB *gorm.DB
 }
 
 // NewIndatabaseGateway ...
@@ -26,14 +25,18 @@ func NewIndatabaseGateway(UserToken *token.JWTToken, db *gorm.DB) *indatabaseGat
     commonImplementation: commonImplementation{
       UserToken: UserToken,
     },
-    DB: db,
   }
 }
 
 func (r *indatabaseGateway) SaveUser(ctx context.Context, obj *entity.User) error {
   log.Info(ctx, "called")
 
-  err := r.DB.Save(obj).Error
+  db, err := database.ExtractDB(ctx)
+  if err != nil {
+    return err
+  }
+
+  err = db.Save(obj).Error
   if err != nil {
     log.Error(ctx, err.Error())
     return err
@@ -45,8 +48,13 @@ func (r *indatabaseGateway) SaveUser(ctx context.Context, obj *entity.User) erro
 func (r *indatabaseGateway) FindOneUserByEmail(ctx context.Context, email string) (*entity.User, error) {
   log.Info(ctx, "called")
 
+  db, err := database.ExtractDB(ctx)
+  if err != nil {
+    return nil, err
+  }
+
   var obj entity.User
-  err := r.DB.
+  err = db.
     Where("email = ?", email).
     First(&obj).Error
 
@@ -62,8 +70,13 @@ func (r *indatabaseGateway) FindOneUserByEmail(ctx context.Context, email string
 func (r *indatabaseGateway) FindAllUser(ctx context.Context) ([]*entity.User, error) {
   log.Info(ctx, "called")
 
+  db, err := database.ExtractDB(ctx)
+  if err != nil {
+    return nil, err
+  }
+
   var objs []*entity.User
-  err := r.DB.
+  err = db.
     Find(&objs).Error
 
   if err != nil {
@@ -77,8 +90,13 @@ func (r *indatabaseGateway) FindAllUser(ctx context.Context) ([]*entity.User, er
 func (r *indatabaseGateway) FindOneUserByID(ctx context.Context, userID string) (*entity.User, error) {
   log.Info(ctx, "called")
 
+  db, err := database.ExtractDB(ctx)
+  if err != nil {
+    return nil, err
+  }
+
   var obj entity.User
-  err := r.DB.
+  err = db.
     Where("id = ?", userID).
     First(&obj).Error
 
@@ -94,7 +112,12 @@ func (r *indatabaseGateway) FindOneUserByID(ctx context.Context, userID string) 
 func (r *indatabaseGateway) UpdateUserAddress(ctx context.Context, obj *entity.User) error {
   log.Info(ctx, "called")
 
-  err := r.DB.Save(obj).Error
+  db, err := database.ExtractDB(ctx)
+  if err != nil {
+    return err
+  }
+
+  err = db.Save(obj).Error
   if err != nil {
     log.Error(ctx, err.Error())
     return err
