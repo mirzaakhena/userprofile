@@ -101,3 +101,9 @@ func (r *inmemoryGateway) RollbackTransaction(ctx context.Context) error {
 
 	return nil
 }
+
+func (r *inmemoryGateway) GetDatabase(ctx context.Context) (context.Context, error) {
+	log.Info(ctx, "Called")
+
+	return ctx, nil
+}
