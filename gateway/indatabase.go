@@ -22,6 +22,12 @@ func NewIndatabaseGateway(UserToken *token.JWTToken, db *gorm.DB) *indatabaseGat
   _ = db.AutoMigrate(&entity.User{})
 
   return &indatabaseGateway{
+    GormReadOnlyImpl: database.GormReadOnlyImpl{
+      DB: db,
+    },
+    GormTransactionImpl: database.GormTransactionImpl{
+      DB: db,
+    },
     commonImplementation: commonImplementation{
       UserToken: UserToken,
     },
@@ -125,4 +131,3 @@ func (r *indatabaseGateway) UpdateUserAddress(ctx context.Context, obj *entity.U
 
   return nil
 }
-

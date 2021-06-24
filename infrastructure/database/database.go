@@ -12,13 +12,13 @@ type contextDBType string
 var ContextDBValue contextDBType = "DB"
 
 type GormTransactionImpl struct {
-  db *gorm.DB
+  DB *gorm.DB
 }
 
 func (r *GormTransactionImpl) BeginTransaction(ctx context.Context) (context.Context, error) {
   log.Info(ctx, "Called")
 
-  dbTrx := r.db.Begin()
+  dbTrx := r.DB.Begin()
 
   trxCtx := context.WithValue(ctx, ContextDBValue, dbTrx)
 
@@ -48,13 +48,13 @@ func (r *GormTransactionImpl) RollbackTransaction(ctx context.Context) error {
 }
 
 type GormReadOnlyImpl struct {
-  db *gorm.DB
+  DB *gorm.DB
 }
 
 func (r *GormReadOnlyImpl) GetDatabase(ctx context.Context) (context.Context, error) {
   log.Info(ctx, "Called")
 
-  trxCtx := context.WithValue(ctx, ContextDBValue, r.db)
+  trxCtx := context.WithValue(ctx, ContextDBValue, r.DB)
 
   return trxCtx, nil
 }
