@@ -83,3 +83,21 @@ func (r *inmemoryGateway) UpdateUserAddress(ctx context.Context, obj *entity.Use
 
 	return apperror.UserIsNotFound
 }
+
+func (r *inmemoryGateway) BeginTransaction(ctx context.Context) (context.Context, error) {
+	log.Info(ctx, "Called")
+
+	return ctx, nil
+}
+
+func (r *inmemoryGateway) CommitTransaction(ctx context.Context) error {
+	log.Info(ctx, "Called")
+
+	return nil
+}
+
+func (r *inmemoryGateway) RollbackTransaction(ctx context.Context) error {
+	log.Info(ctx, "Called")
+
+	return nil
+}

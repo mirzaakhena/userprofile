@@ -53,7 +53,7 @@ func NewUsingdb() func() application.RegistryContract {
 		}
 
 		httpHandler := server.NewGinHTTPHandler(":8080")
-		datasource := gateway.NewIndatabaseGateway(userToken, db)
+		datasource := gateway.NewIndatabase2Gateway(userToken, db)
 
 		return &usingdb{
 			GinHTTPHandler: httpHandler,

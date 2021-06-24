@@ -1,60 +1,70 @@
 package loginuser
 
 import (
-	"context"
-	"userprofile/application/apperror"
-	"userprofile/domain/service"
+  "context"
+  "userprofile/application/apperror"
+  "userprofile/domain/repository"
+  "userprofile/domain/service"
 )
 
 //go:generate mockery --name Outport -output mocks/
 
 type loginUserInteractor struct {
-	outport Outport
+  outport Outport
 }
 
 // NewUsecase is constructor for create default implementation of usecase LoginUser
 func NewUsecase(outputPort Outport) Inport {
-	return &loginUserInteractor{
-		outport: outputPort,
-	}
+  return &loginUserInteractor{
+    outport: outputPort,
+  }
 }
 
 // Execute the usecase LoginUser
 func (r *loginUserInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
 
-	res := &InportResponse{}
+  res := &InportResponse{}
 
-	userObj, err := r.outport.FindOneUserByEmail(ctx, req.Email)
-	if err != nil {
-		return nil, err
-	}
+  err := repository.ReadOnly(ctx, r.outport, func(ctx context.Context) error {
 
-	if userObj == nil {
-		return nil, apperror.InvalidEmailOrPassword
-	}
+    userObj, err := r.outport.FindOneUserByEmail(ctx, req.Email)
+    if err != nil {
+      return err
+    }
 
-	err = r.outport.ValidatePassword(ctx, service.ValidatePasswordServiceRequest{
-		PlainPassword:  req.Password,
-		HashedPassword: userObj.HashedPassword,
-	})
-	if err != nil {
-		return nil, err
-	}
+    if userObj == nil {
+      return apperror.InvalidEmailOrPassword
+    }
 
-	if !userObj.UserIsActive() {
-		return nil, apperror.UserIsNotActive
-	}
+    err = r.outport.ValidatePassword(ctx, service.ValidatePasswordServiceRequest{
+      PlainPassword:  req.Password,
+      HashedPassword: userObj.HashedPassword,
+    })
+    if err != nil {
+      return err
+    }
 
-	tokenString := userObj.GetUserToken()
+    if !userObj.UserIsActive() {
+      return apperror.UserIsNotActive
+    }
 
-	generateTokenResponse, err := r.outport.GenerateToken(ctx, service.GenerateTokenServiceRequest{
-		RawContent: tokenString,
-	})
-	if err != nil {
-		return nil, err
-	}
+    tokenString := userObj.GetUserToken()
 
-	res.Token = generateTokenResponse
+    generateTokenResponse, err := r.outport.GenerateToken(ctx, service.GenerateTokenServiceRequest{
+      RawContent: tokenString,
+    })
+    if err != nil {
+      return err
+    }
 
-	return res, nil
+    res.Token = generateTokenResponse
+
+    return nil
+  })
+
+  if err != nil {
+    return nil, err
+  }
+
+  return res, nil
 }

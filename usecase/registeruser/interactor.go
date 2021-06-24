@@ -4,6 +4,7 @@ import (
   "context"
   "userprofile/application/apperror"
   "userprofile/domain/entity"
+  "userprofile/domain/repository"
   "userprofile/domain/service"
 )
 
@@ -25,52 +26,61 @@ func (r *registerUserInteractor) Execute(ctx context.Context, req InportRequest)
 
   res := &InportResponse{}
 
-  existingUserObj, err := r.outport.FindOneUserByEmail(ctx, req.Email)
-  //if err != nil {
-  //	return nil, err
-  //}
-  if existingUserObj != nil {
-    return nil, apperror.EmailAlreadyUsed
-  }
+  err := repository.WithTransaction(ctx, r.outport, func(ctx context.Context) error {
 
-  generatedUUID := r.outport.GenerateUUID(ctx)
+    existingUserObj, err := r.outport.FindOneUserByEmail(ctx, req.Email)
+    //if err != nil {
+    //	return err
+    //}
+    if existingUserObj != nil {
+      return apperror.EmailAlreadyUsed
+    }
 
-  randomString := r.outport.GenerateRandomString(ctx)
+    generatedUUID := r.outport.GenerateUUID(ctx)
 
-  hashedPassword, err := r.outport.HashPassword(ctx, req.Password)
-  if err != nil {
-    return nil, err
-  }
+    randomString := r.outport.GenerateRandomString(ctx)
 
-  userObj, err := entity.NewUser(entity.UserRequest{
-    UserID:          generatedUUID,
-    Address:         req.Address,
-    Email:           req.Email,
-    HashedPassword:  hashedPassword,
-    ActivationToken: randomString,
+    hashedPassword, err := r.outport.HashPassword(ctx, req.Password)
+    if err != nil {
+      return err
+    }
+
+    userObj, err := entity.NewUser(entity.UserRequest{
+      UserID:          generatedUUID,
+      Address:         req.Address,
+      Email:           req.Email,
+      HashedPassword:  hashedPassword,
+      ActivationToken: randomString,
+    })
+    if err != nil {
+      return err
+    }
+
+    err = r.outport.SaveUser(ctx, userObj)
+    if err != nil {
+      return err
+    }
+
+    activationMessage, err := r.outport.ConstructStartActivationMessage(ctx, service.ConstructStartActivationMessageServiceRequest{
+      Email:           req.Email,
+      ActivationToken: randomString,
+    })
+    if err != nil {
+      return err
+    }
+
+    err = r.outport.SendEmail(ctx, service.SendEmailServiceRequest{
+      EmailDestination: req.Email,
+      Subject:          activationMessage.Subject,
+      ContentBody:      activationMessage.Body,
+    })
+    if err != nil {
+      return err
+    }
+
+    return nil
   })
-  if err != nil {
-    return nil, err
-  }
 
-  err = r.outport.SaveUser(ctx, userObj)
-  if err != nil {
-    return nil, err
-  }
-
-  activationMessage, err := r.outport.ConstructStartActivationMessage(ctx, service.ConstructStartActivationMessageServiceRequest{
-    Email:           req.Email,
-    ActivationToken: randomString,
-  })
-  if err != nil {
-    return nil, err
-  }
-
-  err = r.outport.SendEmail(ctx, service.SendEmailServiceRequest{
-    EmailDestination: req.Email,
-    Subject:          activationMessage.Subject,
-    ContentBody:      activationMessage.Body,
-  })
   if err != nil {
     return nil, err
   }

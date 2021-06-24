@@ -7,6 +7,7 @@ import (
 
 // Outport of RegisterUser
 type Outport interface {
+	repository.TransactionDB
 	repository.SaveUserRepo
 	repository.FindOneUserByEmailRepo
 	service.GenerateUUIDService

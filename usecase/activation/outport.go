@@ -7,6 +7,7 @@ import (
 
 // Outport of Activation
 type Outport interface {
+	repository.TransactionDB
 	repository.FindOneUserByEmailRepo
 	repository.SaveUserRepo
 	service.SendEmailService

@@ -1,36 +1,48 @@
 package showalluser
 
-import "context"
+import (
+  "context"
+  "userprofile/domain/repository"
+)
 
 //go:generate mockery --name Outport -output mocks/
 
 type showAllUSerInteractor struct {
-	outport Outport
+  outport Outport
 }
 
 // NewUsecase is constructor for create default implementation of usecase ShowAllUSer
 func NewUsecase(outputPort Outport) Inport {
-	return &showAllUSerInteractor{
-		outport: outputPort,
-	}
+  return &showAllUSerInteractor{
+    outport: outputPort,
+  }
 }
 
 // Execute the usecase ShowAllUSer
 func (r *showAllUSerInteractor) Execute(ctx context.Context, req InportRequest) (*InportResponse, error) {
 
-	res := &InportResponse{}
+  res := &InportResponse{}
 
-	userObjs, err := r.outport.FindAllUser(ctx)
-	if err != nil {
-		return nil, err
-	}
+  err := repository.ReadOnly(ctx, r.outport, func(ctx context.Context) error {
 
-	for _, u := range userObjs {
-		res.Users = append(res.Users, UserResponse{
-			ID:    u.ID,
-			Email: u.Email,
-		})
-	}
+    userObjs, err := r.outport.FindAllUser(ctx)
+    if err != nil {
+      return err
+    }
 
-	return res, nil
+    for _, u := range userObjs {
+      res.Users = append(res.Users, UserResponse{
+        ID:    u.ID,
+        Email: u.Email,
+      })
+    }
+
+    return nil
+  })
+
+  if err != nil {
+    return nil, err
+  }
+
+  return res, nil
 }
