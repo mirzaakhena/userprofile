@@ -3,6 +3,7 @@ package gateway
 import (
   "context"
   "userprofile/domain/entity"
+  "userprofile/infrastructure/database"
   "userprofile/infrastructure/log"
   "userprofile/infrastructure/token"
 
@@ -26,8 +27,13 @@ func NewIndatabase2Gateway(UserToken *token.JWTToken, db *gorm.DB) *indatabase2G
 func (r *indatabase2Gateway) FindAllUser(ctx context.Context) ([]*entity.User, error) {
   log.Info(ctx, "hellooo world")
 
+  db, err := database.ExtractDB(ctx)
+  if err != nil {
+    return nil, err
+  }
+
   var objs []*entity.User
-  err := r.DB.
+  err = db.
     Find(&objs).Error
 
   if err != nil {
