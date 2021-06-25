@@ -1,6 +1,8 @@
 package userapi
 
-import "userprofile/application/apperror"
+import (
+	"userprofile/application/apperror"
+)
 
 type Response struct {
 	Success      bool        `json:"success"`
@@ -20,7 +22,7 @@ func NewErrorResponse(err error) interface{} {
 	var res Response
 	res.Success = false
 
-	et, ok := err.(apperror.ErrorWithCode)
+	et, ok := err.(apperror.ErrorType)
 	if !ok {
 		res.ErrorCode = "UNDEFINED"
 		res.ErrorMessage = err.Error()
