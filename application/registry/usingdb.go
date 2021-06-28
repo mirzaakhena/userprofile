@@ -52,8 +52,17 @@ func NewUsingdb() func() application.RegistryContract {
 			panic("failed to connect database")
 		}
 
-		httpHandler := server.NewGinHTTPHandler(":8080")
-		datasource := gateway.NewIndatabase2Gateway(userToken, db)
+		httpHandler, err := server.NewGinHTTPHandler(":8080")
+		if err != nil {
+			log.Error(context.Background(), "%v", err.Error())
+			os.Exit(1)
+		}
+
+		datasource, err := gateway.NewIndatabase2Gateway(userToken, db)
+		if err != nil {
+			log.Error(context.Background(), "%v", err.Error())
+			os.Exit(1)
+		}
 
 		return &usingdb{
 			GinHTTPHandler: httpHandler,

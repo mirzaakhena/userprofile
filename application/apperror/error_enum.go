@@ -7,6 +7,7 @@ const (
   DatabaseNotFoundInContextError ErrorType = "ER1003 Database is not found in context" // used by repoimpl
   AddressMustNotEmpty            ErrorType = "ER1000 address must not empty"           //
   IDMustNotEmpty                 ErrorType = "ER1088 id must not empty"                //
+  NoCodeFound                    ErrorType = "there is no code here"                       //
   FieldMustNotEmpty              ErrorType = "ER1033 field %s must not empty"          //
   EmailMustNotEmpty              ErrorType = "ER1000 email must not empty"             //
   PasswordMustNotEmpty           ErrorType = "ER1000 password must not empty"          //

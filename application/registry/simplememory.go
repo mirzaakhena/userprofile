@@ -45,8 +45,17 @@ func NewSimplememory() func() application.RegistryContract {
 		}
 
 		port := viper.GetInt("port")
-		httpHandler := server.NewGinHTTPHandler(fmt.Sprintf(":%d", port))
-		datasource := gateway.NewInmemoryGateway(userToken)
+		httpHandler, err := server.NewGinHTTPHandler(fmt.Sprintf(":%d", port))
+		if err != nil {
+			log.Error(context.Background(), "%v", err.Error())
+			os.Exit(1)
+		}
+
+		datasource, err := gateway.NewInmemoryGateway(userToken)
+		if err != nil {
+			log.Error(context.Background(), "%v", err.Error())
+			os.Exit(1)
+		}
 
 		return &simplememory{
 			GinHTTPHandler: httpHandler,

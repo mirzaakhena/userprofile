@@ -1,133 +1,136 @@
 package gateway
 
 import (
-  "context"
-  "userprofile/domain/entity"
-  "userprofile/infrastructure/database"
-  "userprofile/infrastructure/log"
-  "userprofile/infrastructure/token"
+	"context"
+	"userprofile/domain/entity"
+	"userprofile/infrastructure/database"
+	"userprofile/infrastructure/log"
+	"userprofile/infrastructure/token"
 
-  "gorm.io/gorm"
+	"gorm.io/gorm"
 )
 
 type indatabaseGateway struct {
-  database.GormReadOnlyImpl
-  database.GormTransactionImpl
-  commonImplementation
+	database.GormReadOnlyImpl
+	database.GormTransactionImpl
+	commonImplementation
 }
 
 // NewIndatabaseGateway ...
-func NewIndatabaseGateway(UserToken *token.JWTToken, db *gorm.DB) *indatabaseGateway {
+func NewIndatabaseGateway(UserToken *token.JWTToken, db *gorm.DB) (*indatabaseGateway, error) {
 
-  _ = db.AutoMigrate(&entity.User{})
+	err := db.AutoMigrate(&entity.User{})
+	if err != nil {
+		return nil, err
+	}
 
-  return &indatabaseGateway{
-    GormReadOnlyImpl: database.GormReadOnlyImpl{
-      DB: db,
-    },
-    GormTransactionImpl: database.GormTransactionImpl{
-      DB: db,
-    },
-    commonImplementation: commonImplementation{
-      UserToken: UserToken,
-    },
-  }
+	return &indatabaseGateway{
+		GormReadOnlyImpl: database.GormReadOnlyImpl{
+			DB: db,
+		},
+		GormTransactionImpl: database.GormTransactionImpl{
+			DB: db,
+		},
+		commonImplementation: commonImplementation{
+			UserToken: UserToken,
+		},
+	}, nil
 }
 
 func (r *indatabaseGateway) SaveUser(ctx context.Context, obj *entity.User) error {
-  log.Info(ctx, "called")
+	log.Info(ctx, "called")
 
-  db, err := database.ExtractDB(ctx)
-  if err != nil {
-    return err
-  }
+	db, err := database.ExtractDB(ctx)
+	if err != nil {
+		return err
+	}
 
-  err = db.Save(obj).Error
-  if err != nil {
-    log.Error(ctx, err.Error())
-    return err
-  }
+	err = db.Save(obj).Error
+	if err != nil {
+		log.Error(ctx, err.Error())
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (r *indatabaseGateway) FindOneUserByEmail(ctx context.Context, email string) (*entity.User, error) {
-  log.Info(ctx, "called")
+	log.Info(ctx, "called")
 
-  db, err := database.ExtractDB(ctx)
-  if err != nil {
-    return nil, err
-  }
+	db, err := database.ExtractDB(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-  var obj entity.User
-  err = db.
-    Where("email = ?", email).
-    First(&obj).Error
+	var obj entity.User
+	err = db.
+		Where("email = ?", email).
+		First(&obj).Error
 
-  if err != nil {
-    log.Error(ctx, err.Error())
-    return nil, err
-  }
+	if err != nil {
+		log.Error(ctx, err.Error())
+		return nil, err
+	}
 
-  return &obj, nil
+	return &obj, nil
 
 }
 
 func (r *indatabaseGateway) FindAllUser(ctx context.Context) ([]*entity.User, error) {
-  log.Info(ctx, "called")
+	log.Info(ctx, "called")
 
-  db, err := database.ExtractDB(ctx)
-  if err != nil {
-    return nil, err
-  }
+	db, err := database.ExtractDB(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-  var objs []*entity.User
-  err = db.
-    Find(&objs).Error
+	var objs []*entity.User
+	err = db.
+		Find(&objs).Error
 
-  if err != nil {
-    log.Error(ctx, err.Error())
-    return nil, err
-  }
+	if err != nil {
+		log.Error(ctx, err.Error())
+		return nil, err
+	}
 
-  return objs, nil
+	return objs, nil
 }
 
 func (r *indatabaseGateway) FindOneUserByID(ctx context.Context, userID string) (*entity.User, error) {
-  log.Info(ctx, "called")
+	log.Info(ctx, "called")
 
-  db, err := database.ExtractDB(ctx)
-  if err != nil {
-    return nil, err
-  }
+	db, err := database.ExtractDB(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-  var obj entity.User
-  err = db.
-    Where("id = ?", userID).
-    First(&obj).Error
+	var obj entity.User
+	err = db.
+		Where("id = ?", userID).
+		First(&obj).Error
 
-  if err != nil {
-    log.Error(ctx, err.Error())
-    return nil, err
-  }
+	if err != nil {
+		log.Error(ctx, err.Error())
+		return nil, err
+	}
 
-  return &obj, nil
+	return &obj, nil
 
 }
 
 func (r *indatabaseGateway) UpdateUserAddress(ctx context.Context, obj *entity.User) error {
-  log.Info(ctx, "called")
+	log.Info(ctx, "called")
 
-  db, err := database.ExtractDB(ctx)
-  if err != nil {
-    return err
-  }
+	db, err := database.ExtractDB(ctx)
+	if err != nil {
+		return err
+	}
 
-  err = db.Save(obj).Error
-  if err != nil {
-    log.Error(ctx, err.Error())
-    return err
-  }
+	err = db.Save(obj).Error
+	if err != nil {
+		log.Error(ctx, err.Error())
+		return err
+	}
 
-  return nil
+	return nil
 }

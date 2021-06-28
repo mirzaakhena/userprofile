@@ -16,13 +16,13 @@ type inmemoryGateway struct {
 }
 
 // NewInmemoryGateway ...
-func NewInmemoryGateway(UserToken *token.JWTToken) *inmemoryGateway {
+func NewInmemoryGateway(UserToken *token.JWTToken) (*inmemoryGateway, error) {
 	return &inmemoryGateway{
 		commonImplementation: commonImplementation{
 			UserToken: UserToken,
 		},
 		Users: make([]*entity.User, 0),
-	}
+	}, nil
 }
 
 func (r *inmemoryGateway) SaveUser(ctx context.Context, obj *entity.User) error {
